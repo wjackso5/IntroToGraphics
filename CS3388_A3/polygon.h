@@ -6,9 +6,6 @@ Date: 11/8/2017
 #ifndef POLYGON_H
 #define POLYGON_H
 
-extern "C" {
-#include "matrix.h"
-}
 #include <math.h>
 #include <vector>
 class Polygon
