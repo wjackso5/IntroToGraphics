@@ -18,7 +18,7 @@ extern "C" {
 class Drawer
 {
 private:
-Display disp;
+Display *disp;
 Window window;
 GC gc;
 dmatrix_t camera, light;
