@@ -7,10 +7,10 @@ Date:10/4/17
 
 
 //constructor
-Mesh::Mesh(vector<dmatrix_t> vertexList, vector<Polygon> faceList)
+Mesh::Mesh(std::vector<dmatrix_t> vertexList, std::vector<Polygon> faceList)
 {
-	vector<dmatrix_t> vertexList = vertexList;
-	vector<Polygon> faceList = faceList;
+	std::vector<dmatrix_t> vertexList = vertexList;
+	std::vector<Polygon> faceList = faceList;
 	/*this needs to go in drawer or main
 	//show the mesh based on option params
 	for (int i=0; i<faceList.size(); i++;){
@@ -27,9 +27,9 @@ Mesh::Mesh(vector<dmatrix_t> vertexList, vector<Polygon> faceList)
 Mesh::~Mesh()
 {
 }
-Mesh::getVertexList(){
+std::vector<dmatrix_t> Mesh::getVertexList(){
 	return vertexList;
 }
-Mesh::getFaceList(){
+std::vector<Polygon> Mesh::getFaceList(){
 	return faceList;
 }

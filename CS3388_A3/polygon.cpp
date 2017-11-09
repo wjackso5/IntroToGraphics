@@ -6,7 +6,7 @@ Date: 11/8/2017
 #include "Polygon.h"
 //constructor for a polygon
 //gets the list of vertices and then calculates the normals
-Polygon::Polygon(vector<dmatrix_t> vertexList){
+Polygon::Polygon(std::vector<dmatrix_t> vertexList){
 	vertexList=vertexList;
 	surfaceNormal = *dcross_product(*mat_sub(*vertexList[1], *vertexList[0]) , *mat_sub(*vertexList[2], *vertexList[1]))
 }

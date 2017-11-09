@@ -5,22 +5,22 @@ Date: 11/8/2017
 */
 #ifndef POLYGON_H
 #define POLYGON_H
-#include <vector>
+
 extern "C" {
 #include "matrix.h"
 }
 #include <math.h>
-
+#include <vector>
 class Polygon
 {
 private:
-	vector<dmatrix_t> vertexList;
+	std::vector<dmatrix_t> vertexList;
 	dmatrix_t surfaceNormal;
 
 public:
-	Polygon(vector<dmatrix_t> vertexList);
+	Polygon(std::vector<dmatrix_t> vertexList);
 	~Polygon();
 	dmatrix_t getNormal();
-	vector<dmatrix_t> getVertexList();
+	std::vector<dmatrix_t> getVertexList();
 };
 #endif
