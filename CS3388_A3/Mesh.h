@@ -16,13 +16,13 @@ extern "C" {
 class Mesh
 {
 private:
-	vector<dmatrix_t> vertexList;
-	vector<Polygon> faceList;
+	std::vector<dmatrix_t> vertexList;
+	std::vector<Polygon> faceList;
 
 public:
-	Mesh(vector<dmatrix_t> vertexList, vector<Polygon> faceList );
+	Mesh(std::vector<dmatrix_t> vertexList, std::vector<Polygon> faceList );
 	~Mesh();
-	vector<polygon> getFaceList();
-	vector<dmatrix_t> getVertexList();
+	std::vector<polygon> getFaceList();
+	std::vector<dmatrix_t> getVertexList();
 };
 #endif
