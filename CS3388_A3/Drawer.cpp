@@ -76,7 +76,7 @@ void Drawer::Bresenham(int x1, int y1, int x2, int y2){
 }
 
 //draws the lines of the polygon
-void drawPolygon(Polygon p){
+void Drawer::drawPolygon(Polygon p){
 for (int i=0; i<p.getVertexList().size()-1; i++){
 	Bresenham(p.getVertexList().at(i).m[1][1], p.getVertexList().at(i).m[2][1], p.getVertexList().at(i).m[1][1], p.getVertexList().at(i).m[2][1]);
 }
