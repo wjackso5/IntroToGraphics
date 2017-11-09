@@ -4,13 +4,7 @@ Date: 11/8/2017
 */
 #ifndef DRAWER_H
 #define DRAWER_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <math.h>
-#include <X11/Xlib.h>
-#include <vector>
-#include "Mesh.h"
+
 class Drawer
 {
 private:

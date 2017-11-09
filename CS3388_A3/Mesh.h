@@ -5,9 +5,7 @@ Date:10/4/17
 */
 #ifndef MESH_H
 #define MESH_H
-#include <vector>
-#include "matrix.h"
-#include <math.h>
+
 #include "Polygon.h"
 
 

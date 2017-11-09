@@ -5,9 +5,6 @@ Date: 11/8/2017
 */
 #ifndef POLYGON_H
 #define POLYGON_H
-
-#include <math.h>
-#include <vector>
 class Polygon
 {
 private:
