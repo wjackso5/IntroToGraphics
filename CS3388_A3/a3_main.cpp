@@ -9,7 +9,9 @@
 #include <math.h>
 #include <X11/Xlib.h>
 #include "matrix.h"
-
+#include <vector>
+#include "Drawer.h"
+#include "Mesh.h"
 /*define the radius' for the objects to be created
 TORUS_RA is the distance from the centre of the torus to the center of the tube
 and TORUS_RB is the radius of the tube*/
@@ -53,8 +55,8 @@ and TORUS_RB is the radius of the tube*/
 #define H  512
 
 void Bresenham(int, int, int, int, Display*, Window, GC);
-void Draw_Sphere(Display*, Window , GC, dmatrix_t );
-void Draw_Torus(Display*, Window , GC , dmatrix_t);
+void CreateSphere(dmatrix_t C);
+void CreateTorus(dmatrix_t C);
 
 dmatrix_t *build_camera_matrix(dmatrix_t *E, dmatrix_t *G) {
     
@@ -180,22 +182,22 @@ and through all row between 0...Pi. It takes four parameters, the first three ar
 that we can call our implementation of bresenham. The fourth is the camera Matrix which we need to preform perspective projections.
 The radius of the sphere is declared in the header of this file as a constant as well as the deltas for row and theta.
 */
-void Draw_Sphere(Display *disp, Window window, GC gc, dmatrix_t C){
+Mesh createSphere(dmatrix_t C){
+    //declare Vector and face List for the mesh to be made
+    vector<dmatrix_t> vertexList;
+    vector<Polygon> faceList;
     /*set the current value of theta and row*/
         double t=0;
         double r=0;
         
+        dmatrix_t P0 ; /*set the starting point to draw the sphere. at the very top.*/
+        dmat_alloc(&P0,4,1) ;
         dmatrix_t P1 ; /*set the starting point to draw the sphere. at the very top.*/
         dmat_alloc(&P1,4,1) ;
-
-        P1.m[1][1] = SPHERE_R*cos(t)*sin(r);
-        P1.m[2][1] = SPHERE_R*sin(t)*sin(r);
-        P1.m[3][1] = cos(r)*SPHERE_R ;
-        P1.m[4][1] = 1.0 ;
-
-
-        dmatrix_t P2 ; /*set the next point to draw the sphere.*/
+        dmatrix_t P2 ; /*set the starting point to draw the sphere. at the very top.*/
         dmat_alloc(&P2,4,1) ;
+        dmatrix_t P3 ; /*set the starting point to draw the sphere. at the very top.*/
+        dmat_alloc(&P3,4,1) ;
 
         /*loop through all the possible values for theta and row to draw our sphere*/
         while (t < 2*M_PI){
@@ -203,28 +205,56 @@ void Draw_Sphere(Display *disp, Window window, GC gc, dmatrix_t C){
             r=0;
             while (r < M_PI){
             r = r + DELTA_ROW;
-            /*set up P2 using new theta/row*/
-            P2.m[1][1] = cos(t)*sin(r)*SPHERE_R;
-            P2.m[2][1] = sin(t)*sin(r)*SPHERE_R;
-            P2.m[3][1] = cos(r)*SPHERE_R;
+            /*set up P0 using new theta/row*/
+            P0.m[1][1] = cos(t)*sin(r)*SPHERE_R;
+            P0.m[2][1] = sin(t)*sin(r)*SPHERE_R;
+            P0.m[3][1] = cos(r)*SPHERE_R;
+            P0.m[4][1] = 1.0 ;
+            // for P1
+            P1.m[1][1] = cos(t+DELTA_THETA)*sin(r)*SPHERE_R;
+            P1.m[2][1] = sin(t+DELTA_THETA)*sin(r)*SPHERE_R;
+            P1.m[3][1] = cos(r)*SPHERE_R;
+            P1.m[4][1] = 1.0 ;
+            // for P2
+            P2.m[1][1] = cos(t+DELTA_THETA)*sin(r+DELTA_ROW)*SPHERE_R;
+            P2.m[2][1] = sin(t+DELTA_THETA)*sin(r+DELTA_ROW)*SPHERE_R;
+            P2.m[3][1] = cos(r+DELTA_ROW)*SPHERE_R;
             P2.m[4][1] = 1.0 ;
-            /*multiply the points by the camera matrix and then apply the perspective projections onto those points*/
+            // for P3
+            P3.m[1][1] = cos(t)*sin(r+DELTA_ROW)*SPHERE_R;
+            P3.m[2][1] = sin(t)*sin(r+DELTA_ROW)*SPHERE_R;
+            P3.m[3][1] = cos(r+DELTA_ROW)*SPHERE_R;
+            P3.m[4][1] = 1.0 ;
+            //apply perspective projections
+            dmatrix_t Pp0; 
+            dmat_alloc(&Pp0,4,1);
             dmatrix_t Pp1; 
             dmat_alloc(&Pp1,4,1);
             dmatrix_t Pp2; 
             dmat_alloc(&Pp2,4,1);
-            Pp1 = *perspective_projection(dmat_mult(&C,&P1)); 
-            Pp2 = *perspective_projection(dmat_mult(&C,&P2));
-            /*use bresenhams line drawing algorithm to draw a line from p1 to p2, forming a line in our sphere*/
-            Bresenham((int)Pp1.m[1][1],(int)Pp1.m[2][1],(int)Pp2.m[1][1],(int)Pp2.m[2][1],disp,window,gc); //This function draws points
-            /*set P1 to P2 since we are going to do it all again for the next point*/
-            P1.m[1][1] = P2.m[1][1];
-            P1.m[2][1] = P2.m[2][1];
-            P1.m[3][1] = P2.m[3][1];
-            P1.m[4][1] = P2.m[4][1];
+            dmatrix_t Pp3; 
+            dmat_alloc(&Pp3,4,1);
+            Pp0 = *perspective_projection(dmat_mult(&C,&P0)); 
+            Pp1 = *perspective_projection(dmat_mult(&C,&P1));
+            Pp2 = *perspective_projection(dmat_mult(&C,&P2)); 
+            Pp3 = *perspective_projection(dmat_mult(&C,&P3));
+            //add Pp0 to vertex list.
+            vertexList.push_back(Pp0);
+            //poly list for this polygon
+            vector<dmatrix_t> polyVertexList;
+            polyVertexList.push_back(Pp0);
+            polyVertexList.push_back(Pp1);
+            polyVertexList.push_back(Pp2);
+            polyVertexList.push_back(Pp4);
+            //create the polygon
+            poly= Polygon(polyVertexList);
+            //add polygon to faceList
+            faceList.push_back(poly);
             }
         }
-
+        //now that we have populated the lists, we will make the mesh for the sphere
+        sphere = Mesh(vertexList, faceList);
+        return sphere;
 }
 /*
 This function draws a torus using our implementation of bresenham by iterating through all theta between 0...2*Pi
@@ -232,7 +262,7 @@ and through all row between 0...2*Pi. It takes four parameters, the first three 
 that we can call our implementation of bresenham. The fourth is the camera Matrix which we need to preform perspective projections.
 The radii are declared in the header of this file as constants as well as the deltas for row and theta.
 */
-void Draw_Torus(Display *disp, Window window, GC gc, dmatrix_t C){
+void createTorus(dmatrix_t C){
     /*set the current value of theta and row*/
         double t=0;
         double r=0;
@@ -333,14 +363,10 @@ int main() {
 
         dmat_alloc(&C,4,4);
         C = *build_camera_matrix(&E,&G) ;
+        Mesh sphere = createSphere(C);
+        Drawer drawer = Drawer(disp, window, GC, C, C);
+        drawer.drawPolygon(sphere);
         
-        //call Draw_Sphere
-        Draw_Sphere(disp,window,gc, C);
-
-        //call Draw_Torus
-        Draw_Torus(disp,window,gc, C);
- 
-        //handle exit input
         char inp='0';
         while(inp!='q'){
            printf("press q+enter to exit: ");
