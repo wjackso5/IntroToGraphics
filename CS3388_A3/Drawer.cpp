@@ -82,5 +82,5 @@ for (int i=0; i<p.getVertexList().size()-1; i++){
 }
 //draw last line between final point and first point
 //connect last point with first point
-Bresenham(p.getVertexList().at(p.getVertexList().size()-1).m[1][1], p.getVertexList().at(p.getVertexList().size()-1).m[2][1], p.getVertexList().at(0)[1][1], p.getVertexList().at(0).m[2][1]);
+Bresenham(p.getVertexList().at(p.getVertexList().size()-1).m[1][1], p.getVertexList().at(p.getVertexList().size()-1).m[2][1], p.getVertexList().at(0).m[1][1], p.getVertexList().at(0).m[2][1]);
 }
