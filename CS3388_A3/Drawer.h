@@ -23,7 +23,7 @@ Window window;
 GC gc;
 dmatrix_t camera, light;
 public:
-	Drawer(Display *disp, Window window, GC gc, dmatrix_t camera, dmatrix_t light);
+	Drawer(Display *disp1, Window window1, GC gc1, dmatrix_t camera1, dmatrix_t light1);
 	~Drawer();
 
 	void fillPolygon(Polygon p);

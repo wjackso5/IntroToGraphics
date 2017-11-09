@@ -6,13 +6,13 @@ Date: 11/8/2017
 
 
 //constructor
-Drawer::Drawer(Display *disp, Window window, GC gc, dmatrix_t camera, dmatrix_t light)
+Drawer::Drawer(Display *disp1, Window window1, GC gc1, dmatrix_t camera1, dmatrix_t light1)
 {
-	disp=disp;
-	window=window;
-	gc=gc;
-	camera = camera;
-	light = light;
+	disp=disp1;
+	window=window1;
+	gc=gc1;
+	camera = camera1;
+	light = light1;
 }
 //deconstructor
 Drawer::~Drawer()

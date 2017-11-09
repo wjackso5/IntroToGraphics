@@ -18,7 +18,7 @@ private:
 	dmatrix_t surfaceNormal;
 
 public:
-	Polygon(std::vector<dmatrix_t> vertexList);
+	Polygon(std::vector<dmatrix_t> vertexList1);
 	~Polygon();
 	dmatrix_t getNormal();
 	std::vector<dmatrix_t> getVertexList();
