@@ -19,6 +19,8 @@ public:
 	Polygon(list<dmatrix_t> vertexList);
 	~Polygon();
 	dmatrix_t getNormal();
+	void getVertexList();
+	void getFaceList();
 	void fill(int color, dmatrix_t lightSource);
 	void Bresenham(int x1, int y1, int x2, int y2, Display *disp, Window window, GC gc);
 	void drawLines(int color);

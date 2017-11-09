@@ -26,3 +26,9 @@ Mesh::Mesh(int drawlines, int polyfill, int hideback, vector<dmatrix> vertexList
 Mesh::~Mesh()
 {
 }
+void Mesh::getVertexList(){
+	return vertexList;
+}
+void Mesh::getFaceList(){
+	return faceList;
+}
