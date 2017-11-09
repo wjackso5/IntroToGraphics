@@ -3,9 +3,12 @@
         PREREQUISITES : nr.h 
 
 */
+#ifndef MATRIX_H
+#define MATRIX_H
 
 #include "nr.h"
 #include <math.h>
+
 
 typedef struct {
   float **m ;
@@ -758,3 +761,4 @@ void write_imatrix(imatrix_t *M)
     printf("\n") ;
   }
 }
+#endif 

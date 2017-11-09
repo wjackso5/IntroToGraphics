@@ -14,12 +14,11 @@ Polygon::Polygon(vector<dmatrix_t> vertexList){
 Polygon::~Polygon(){
 }
 //getter for surface normal
-dmatrix Polygon::getNormal(){
+dmatrix_t Polygon::getNormal(){
 	return surfaceNormal;
 }
-dmatri Polygon::getVertexList(){
+dmatrix_t Polygon::getVertexList(){
 	return vertexList;
 }
 
-}
 

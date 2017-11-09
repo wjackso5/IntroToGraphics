@@ -9,6 +9,9 @@ Date:10/4/17
 #include "matrix.h"
 #include <math.h>
 #include "Polygon.h"
+extern "C" {
+#include "matrix.h"
+}
 
 class Mesh
 {
