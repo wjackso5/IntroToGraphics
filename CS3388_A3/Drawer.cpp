@@ -8,17 +8,17 @@ Date: 11/8/2017
 //constructor
 Drawer::Drawer(Display *disp1, Window window1, GC gc1, dmatrix_t camera1, dmatrix_t light1)
 {
-	disp=disp1;
-	window=window1;
-	gc=gc1;
-	camera = camera1;
-	light = light1;
+	this->disp=disp1;
+	this->window=window1;
+	this->gc=gc1;
+	this->camera = camera1;
+	this->light = light1;
 }
 //deconstructor
 Drawer::~Drawer()
 {
 }
-void fillPolygon(Polygon p){
+void Drawer::fillPolygon(Polygon p){
 
 }
 
@@ -26,7 +26,7 @@ void fillPolygon(Polygon p){
 taken from my A1 for which i got full marks except for forgetting to comment,
 given the x,y of two points, aswell as information about the drawing window, draw that line to the screen.
 */
-void Bresenham(int x1, int y1, int x2, int y2){
+void Drawer::Bresenham(int x1, int y1, int x2, int y2){
 
     int dx, dy, sx, sy;
  	float slope, pitch;
