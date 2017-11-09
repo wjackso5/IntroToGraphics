@@ -8,7 +8,7 @@ Date: 11/8/2017
 //gets the list of vertices and then calculates the normals
 Polygon::Polygon(std::vector<dmatrix_t> vertexList){
 	vertexList=vertexList;
-	surfaceNormal = *dcross_product(*mat_sub((vertexList[1]), (vertexList[0]) , *mat_sub(vertexList[2], vertexList[1]));
+	surfaceNormal = *dcross_product(dmat_sub(vertexList[1], vertexList[0]) , dmat_sub(vertexList[2]), vertexList[1]));
 }
 //deconstuctor
 Polygon::~Polygon(){
