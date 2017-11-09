@@ -3,7 +3,7 @@ Author: Will Jackson
 Purpose: This is the implementation file for the class file that stores a polygon
 Date: 11/8/2017
 */
-#include "polygon.h"
+#include "Polygon.h"
 //constructor for a polygon
 //gets the list of vertices and then calculates the normals
 Polygon::Polygon(vector<dmatrix_t> vertexList){
