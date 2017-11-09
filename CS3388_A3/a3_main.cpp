@@ -175,57 +175,6 @@ dmatrix_t *perspective_projection(dmatrix_t *P) {
     return P ;
 }
 /*
-taken from my A1 for which i got full marks except for forgetting to comment,
-given the x,y of two points, aswell as information about the drawing window, draw that line to the screen.
-*/
-void Bresenham(int x1, int y1, int x2, int y2, Display *disp, Window window, GC gc){
-    int dx, dy, sx, sy;
- 	float slope, pitch;
- 	//if it is just a single pixel
- 	if (x1==x2 && y1==y2){
- 		XDrawPoint(disp, window, gc, x1, y1);
- 		XFlush(disp);
- 		return;
-	 }
-	 //delta x
-	 dx = x2 - x1;
-	 //x is decreasing over the line seg
-	 if (dx<0){
-	 	sx=-1;
-	 //x is increasing over the line seg
-	 }else{
-	 	sx=1;
-	 }
-	 //delta y
-	 dy = y2 - y1;
-	 //y is decreasing over the line seg
-	 if (dy<0){
-	 	sy=-1;
-	 }else{//y is increasing over the line seg
-	 	sy=1;
-	 }
-	 //is slope dy/dx or dx/dy
-	 if (abs(dy) < abs(dx)){
-	 	slope = (float)dy/(float)dx;
-	 	pitch = y1 - slope*x1;
-	 	//draw the points along the line
-	 while(x1!=x2){
-	 	XDrawPoint(disp, window, gc, x1, (int)round(slope*x1+pitch));
-	 	XFlush(disp);
-	 	x1+=sx;
-	 }
-	 }else{
-	 	//same thing but inverted
-	 	slope = (float)dx/(float)dy;
-	 	pitch = x1 - slope*y1;
-	 while (y1!=y2){
-	 	XDrawPoint(disp, window, gc, (int)round(slope*y1+pitch), y1);
-	 	XFlush(disp);
-	 	y1+=sy;
-	 }
- }
-}
-/*
 This function draws a sphere using our implementation of bresenham by iterating through all theta between 0...2*Pi
 and through all row between 0...Pi. It takes four parameters, the first three are all information about the X11 display so
 that we can call our implementation of bresenham. The fourth is the camera Matrix which we need to preform perspective projections.
