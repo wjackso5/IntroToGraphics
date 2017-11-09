@@ -78,9 +78,9 @@ void Bresenham(int x1, int y1, int x2, int y2){
 //draws the lines of the polygon
 void drawPolygon(Polygon p){
 for (int i=0; i<p.getVertexList().size()-1; i++){
-	Bresenham(p.getVertexList().at(i).[1][1], p.getVertexList().at(i).[2][1], p.getVertexList().at(i).[1][1], p.getVertexList().at(i).[2][1]);
+	Bresenham(p.getVertexList().at(i)[1][1], p.getVertexList().at(i)[2][1], p.getVertexList().at(i)[1][1], p.getVertexList().at(i)[2][1]);
 }
 //draw last line between final point and first point
 //connect last point with first point
-Bresenham(p.getVertexList().at(p.getVertexList().size()-1).[1][1], p.getVertexList().at(p.getVertexList().size()-1).[2][1], p.getVertexList().at(0).[1][1], p.getVertexList().at(0).[2][1]);
+Bresenham(p.getVertexList().at(p.getVertexList().size()-1)[1][1], p.getVertexList().at(p.getVertexList().size()-1)[2][1], p.getVertexList().at(0)[1][1], p.getVertexList().at(0)[2][1]);
 }
