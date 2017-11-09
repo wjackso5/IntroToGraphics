@@ -5,6 +5,7 @@ Date: 11/8/2017
 #ifndef DRAWER_H
 #define DRAWER_H
 
+#include "Mesh.h"
 class Drawer
 {
 private:

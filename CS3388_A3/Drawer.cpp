@@ -3,7 +3,9 @@ Purpose: This is the header file for the drawer class takes care of the visualiz
 Date: 11/8/2017
 */
 #include "Drawer.h"
-
+#include <math.h>
+#include <X11/Xlib.h>
+#include <vector>
 
 //constructor
 Drawer::Drawer(Display *disp1, Window window1, GC gc1, dmatrix_t camera1, dmatrix_t light1)

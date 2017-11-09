@@ -3,7 +3,8 @@
         PREREQUISITES : None
 
 */
-
+#ifndef MATRIX_H
+#define MATRIX_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -472,3 +473,4 @@ dmatrix_t *from_homogeneous(dmatrix_t *A) {
   }
   return B ;
 } 
+#endif
