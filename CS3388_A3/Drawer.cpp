@@ -20,7 +20,7 @@ Drawer::~Drawer()
 }
 
 void Drawer::drawMesh(Mesh mesh){
-	vector<Polygon> faceList = mesh.getFaceList();
+	std::vector<Polygon> faceList = mesh.getFaceList();
 	for (int i=0; i<faceList.size(); i++){
 		Polygon face = faceList.at(i);
 		dmatrix_t n = face.getNormal(); 
