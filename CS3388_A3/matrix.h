@@ -3,9 +3,10 @@
         PREREQUISITES : None
 
 */
+extern "C"{
 #ifndef MATRIX_H
 #define MATRIX_H
-extern "C"{
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
