@@ -20,7 +20,8 @@ Drawer::~Drawer()
 }
 
 void Drawer::drawMesh(Mesh mesh){
-	for (int i=0; i<faceList.size(); i++;){
+	vector<Polygon> faceList = mesh.getFaceList();
+	for (int i=0; i<faceList.size(); i++){
 		Polygon face = faceList.at(i);
 		dmatrix_t n = face.getNormal(); 
 		if (acos((n.m[1][1]*camera.m[1][1]+n.m[2][1]*camera.m[2][1]+n.m[3][1]*camera.m[3][1])/(sqrt(n.m[1][1]*n.m[1][1]+n.m[2][1]*n.m[2][1]+n.m[3][1]*n.m[3][1])*sqrt(camera.m[1][1]*camera.m[1][1]+camera.m[2][1]*camera.m[2][1]+camera.m[3][1]*camera.m[3][1])))<90.0){

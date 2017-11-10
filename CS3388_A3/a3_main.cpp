@@ -259,8 +259,10 @@ Mesh createSphere(dmatrix_t C){
 /*
 This function creates a torus using our by iterating through all theta between 0...2*Pi
 */
-void createTorus(dmatrix_t C){
+Mesh createTorus(dmatrix_t C){
     /*set the current value of theta and row*/
+        std::vector<dmatrix_t> vertexList;
+        std::vector<dmatrix_t> polyVertexList;
         double t=0;
         double r=0;
         //declare points for polygon
@@ -316,7 +318,7 @@ void createTorus(dmatrix_t C){
             //add Pp0 to vertex list.
             vertexList.push_back(Pp0);
             //poly list for this polygon
-            std::vector<dmatrix_t> polyVertexList;
+            
             polyVertexList.push_back(Pp0);
             polyVertexList.push_back(Pp1);
             polyVertexList.push_back(Pp2);
@@ -388,7 +390,7 @@ int main() {
         dmat_alloc(&C,4,4);
         C = *build_camera_matrix(&E,&G) ;
         Mesh sphere = createSphere(C);
-        Drawer drawer = Drawer(disp, window, GC, C, C);
+        Drawer drawer = Drawer(*disp, window, GC, C, C);
         drawer.drawMesh(sphere);
         
         char inp='0';
