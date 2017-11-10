@@ -318,7 +318,7 @@ Mesh createTorus(dmatrix_t C){
             //add Pp0 to vertex list.
             vertexList.push_back(Pp0);
             //poly list for this polygon
-            
+            std::vector<dmatrix_t> polyVertexList;
             polyVertexList.push_back(Pp0);
             polyVertexList.push_back(Pp1);
             polyVertexList.push_back(Pp2);
