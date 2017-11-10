@@ -295,17 +295,42 @@ void shade_wiremesh_sphere(Display *d, Window w, int s, dmatrix_t *C, dmatrix_t 
  
   for (theta = theta_lower_bound ; theta + delta_theta < theta_upper_bound + EPSILON ; theta += delta_theta) {
     for (rho = rho_lower_bound ; rho + delta_rho < rho_upper_bound + EPSILON ; rho += delta_rho) {
+		double temp_theta = theta;
+		double temp_rho = rho;
+		//set p0
+		P0[0] = *perspective_projection(dmat_mult(C, sphere_point(&P0[0], radius, temp_theta, temp_rho)));
+		P0[1] = *perspective_projection(dmat_mult(C, sphere_point(&P0[1], radius, temp_theta + delta_theta, temp_rho)));
+		P0[2] = *perspective_projection(dmat_mult(C, sphere_point(&P0[2], radius, temp_theta, temp_rho + delta_rho)));
+		//set p1
+		temp_theta = theta + delta_theta;
+		temp_rho = rho;
+		P1[0] = *perspective_projection(dmat_mult(C, sphere_point(&P1[0], radius, temp_theta, temp_rho)));
+		P1[1] = *perspective_projection(dmat_mult(C, sphere_point(&P1[1], radius, temp_theta + delta_theta, temp_rho)));
+		P1[2] = *perspective_projection(dmat_mult(C, sphere_point(&P1[2], radius, temp_theta, temp_rho + delta_rho)));
+		//set p2
+		temp_theta = theta + delta_theta;
+		temp_rho = rho + delta_rho;
+		P2[0] = *perspective_projection(dmat_mult(C, sphere_point(&P2[0], radius, temp_theta, temp_rho)));
+		P2[1] = *perspective_projection(dmat_mult(C, sphere_point(&P2[1], radius, temp_theta + delta_theta, temp_rho)));
+		P2[2] = *perspective_projection(dmat_mult(C, sphere_point(&P2[2], radius, temp_theta, temp_rho + delta_rho)));
+		//set p3
+		temp_theta = theta;
+		temp_rho = rho + delta_rho;
+		P2[0] = *perspective_projection(dmat_mult(C, sphere_point(&P2[0], radius, temp_theta, temp_rho)));
+		P2[1] = *perspective_projection(dmat_mult(C, sphere_point(&P2[1], radius, temp_theta + delta_theta, temp_rho)));
+		P2[2] = *perspective_projection(dmat_mult(C, sphere_point(&P2[2], radius, temp_theta, temp_rho + delta_rho)));
+		//calculate normal for surface of the polygon
 
-        P0[0] = *perspective_projection(dmat_mult(C,sphere_point(&P[0],radius,theta,rho))) ; 
-        P1[1] = *perspective_projection(dmat_mult(C,sphere_point(&P[1],radius,theta+delta_theta,rho))) ;
-        P2[2] = *perspective_projection(dmat_mult(C,sphere_point(&P[2],radius,theta,rho+delta_rho))) ;
-
+		//draw outlines
         bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
         bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
     }
   }
   for (i = 0 ; i < TRIANGLE ; i++) {
-    free_dmatrix(P[i].m,1,P[i].l,1,P[i].c) ;
+    free_dmatrix(P0[i].m,1,P[i].l,1,P[i].c) ;
+	free_dmatrix(P1[i].m, 1, P[i].l, 1, P[i].c);
+	free_dmatrix(P2[i].m, 1, P[i].l, 1, P[i].c);
+	free_dmatrix(P3[i].m, 1, P[i].l, 1, P[i].c);
   }
 }
 
