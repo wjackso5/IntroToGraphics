@@ -390,7 +390,7 @@ int main() {
         dmat_alloc(&C,4,4);
         C = *build_camera_matrix(&E,&G) ;
         Mesh sphere = createSphere(C);
-        Drawer drawer = Drawer(&disp, window, GC, &C, &C);
+        Drawer drawer = Drawer(disp, window, gc, C, C);
         drawer.drawMesh(sphere);
         
         char inp='0';
