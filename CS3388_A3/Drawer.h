@@ -19,7 +19,7 @@ dmatrix_t camera, light;
 public:
 	Drawer(Display *disp1, Window window1, GC gc1, dmatrix_t camera1, dmatrix_t light1);
 	~Drawer();
-
+	void drawMesh(Mesh m);
 	void fillPolygon(Polygon p);
 	void Bresenham(int x1, int y1, int x2, int y2);
 	void drawPolygon(Polygon p);

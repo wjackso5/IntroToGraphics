@@ -18,6 +18,7 @@ Drawer::Drawer(Display *disp1, Window window1, GC gc1, dmatrix_t camera1, dmatri
 Drawer::~Drawer()
 {
 }
+
 void Drawer::drawMesh(Mesh mesh){
 	for (int i=0; i<faceList.size(); i++;){
 		Polygon face = faceList.at(i);
@@ -27,6 +28,7 @@ void Drawer::drawMesh(Mesh mesh){
 		}else{
 			drawPolygon(faceList.at(i));
 		}
+}
 }
 void Drawer::fillPolygon(Polygon p){
 
