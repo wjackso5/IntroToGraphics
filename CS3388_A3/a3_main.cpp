@@ -184,8 +184,8 @@ The radius of the sphere is declared in the header of this file as a constant as
 */
 Mesh createSphere(dmatrix_t C){
     //declare Vector and face List for the mesh to be made
-    vector<dmatrix_t> vertexList;
-    vector<Polygon> faceList;
+    std::vector<dmatrix_t> vertexList;
+    std::vector<Polygon> faceList;
     /*set the current value of theta and row*/
         double t=0;
         double r=0;
@@ -241,72 +241,96 @@ Mesh createSphere(dmatrix_t C){
             //add Pp0 to vertex list.
             vertexList.push_back(Pp0);
             //poly list for this polygon
-            vector<dmatrix_t> polyVertexList;
+            std::vector<dmatrix_t> polyVertexList;
             polyVertexList.push_back(Pp0);
             polyVertexList.push_back(Pp1);
             polyVertexList.push_back(Pp2);
-            polyVertexList.push_back(Pp4);
+            polyVertexList.push_back(Pp3);
             //create the polygon
-            poly= Polygon(polyVertexList);
+            Polygon poly = Polygon(polyVertexList);
             //add polygon to faceList
             faceList.push_back(poly);
             }
         }
         //now that we have populated the lists, we will make the mesh for the sphere
-        sphere = Mesh(vertexList, faceList);
+        Mesh sphere = Mesh(vertexList, faceList);
         return sphere;
 }
 /*
-This function draws a torus using our implementation of bresenham by iterating through all theta between 0...2*Pi
-and through all row between 0...2*Pi. It takes four parameters, the first three are all information about the X11 display so
-that we can call our implementation of bresenham. The fourth is the camera Matrix which we need to preform perspective projections.
-The radii are declared in the header of this file as constants as well as the deltas for row and theta.
+This function creates a torus using our by iterating through all theta between 0...2*Pi
 */
 void createTorus(dmatrix_t C){
     /*set the current value of theta and row*/
         double t=0;
         double r=0;
-        
-        dmatrix_t P1 ; /*set the starting point to draw the Torus.*/
+        //declare points for polygon
+        dmatrix_t P0 ;
+        dmat_alloc(&P0,4,1) ;
+        dmatrix_t P1 ;
         dmat_alloc(&P1,4,1) ;
-
-        P1.m[1][1] = (TORUS_RA+(TORUS_RB*cos(t)))*cos(r);
-        P1.m[2][1] = (TORUS_RA+(TORUS_RB*cos(t)))*sin(r);
-        P1.m[3][1] = TORUS_RB*sin(t);
-        P1.m[4][1] = 1.0 ;
-
-
-        dmatrix_t P2 ; /*set the next point to draw the torus.*/
+        dmatrix_t P2 ;
         dmat_alloc(&P2,4,1) ;
+        dmatrix_t P3 ; 
+        dmat_alloc(&P3,4,1) ;
 
-        /*loop through all the possible values for theta and row to draw our torus*/
+        /*loop through all the possible values for theta and row to genertae our torus*/
         while (t < 2*M_PI){
             t = t + DELTA_THETA;
             r=0;
             while (r < 2*M_PI){
+            
             r = r + DELTA_ROW;
-            /* set up P2 using new theta/row */
-            P2.m[1][1] = (TORUS_RA+(TORUS_RB*cos(t)))*cos(r);
-            P2.m[2][1] = (TORUS_RA+(TORUS_RB*cos(t)))*sin(r);
-            P2.m[3][1] = TORUS_RB*sin(t);
+            //points on the polygon
+            P0.m[1][1] = (TORUS_RA+(TORUS_RB*cos(t)))*cos(r);
+            P0.m[2][1] = (TORUS_RA+(TORUS_RB*cos(t)))*sin(r);
+            P0.m[3][1] = TORUS_RB*sin(t);
+            P0.m[4][1] = 1.0 ;
+            // for P1
+            P1.m[1][1] = (TORUS_RA+(TORUS_RB*cos(t+DELTA_THETA)))*cos(r);
+            P1.m[2][1] = (TORUS_RA+(TORUS_RB*cos(t+DELTA_THETA)))*sin(r);
+            P1.m[3][1] = TORUS_RB*sin(t+DELTA_THETA);
+            P1.m[4][1] = 1.0 ;
+            // for P2
+            P2.m[1][1] = (TORUS_RA+(TORUS_RB*cos(t+DELTA_THETA)))*cos(r+DELTA_ROW);
+            P2.m[2][1] = (TORUS_RA+(TORUS_RB*cos(t+DELTA_THETA)))*sin(r+DELTA_ROW);
+            P2.m[3][1] = TORUS_RB*sin(t+DELTA_THETA);
             P2.m[4][1] = 1.0 ;
-            /*multiply the points by the camera matrix and then apply the perspective projections onto those points*/
+            // for P3
+            P3.m[1][1] = (TORUS_RA+(TORUS_RB*cos(t)))*cos(r+DELTA_ROW);
+            P3.m[2][1] = (TORUS_RA+(TORUS_RB*cos(t)))*sin(r+DELTA_ROW);
+            P3.m[3][1] = TORUS_RB*sin(t);
+            P3.m[4][1] = 1.0 ;
+            //apply perspective projections
+            dmatrix_t Pp0; 
+            dmat_alloc(&Pp0,4,1);
             dmatrix_t Pp1; 
             dmat_alloc(&Pp1,4,1);
             dmatrix_t Pp2; 
             dmat_alloc(&Pp2,4,1);
-            Pp1 = *perspective_projection(dmat_mult(&C,&P1)); 
-            Pp2 = *perspective_projection(dmat_mult(&C,&P2));
-            /*use bresenhams line drawing algorithm to draw a line from p1 to p2, forming a line in our torus*/
-            
-            Bresenham((int)Pp1.m[1][1],(int)Pp1.m[2][1],(int)Pp2.m[1][1],(int)Pp2.m[2][1],disp,window,gc); //This function draws points
-            /*set P1 to P2 since we are going to do it all again for the next point*/
-            P1.m[1][1] = P2.m[1][1];
-            P1.m[2][1] = P2.m[2][1];
-            P1.m[3][1] = P2.m[3][1];
-            P1.m[4][1] = P2.m[4][1];
-            }
+            dmatrix_t Pp3; 
+            dmat_alloc(&Pp3,4,1);
+            Pp0 = *perspective_projection(dmat_mult(&C,&P0)); 
+            Pp1 = *perspective_projection(dmat_mult(&C,&P1));
+            Pp2 = *perspective_projection(dmat_mult(&C,&P2)); 
+            Pp3 = *perspective_projection(dmat_mult(&C,&P3));
+            //add Pp0 to vertex list.
+            vertexList.push_back(Pp0);
+            //poly list for this polygon
+            std::vector<dmatrix_t> polyVertexList;
+            polyVertexList.push_back(Pp0);
+            polyVertexList.push_back(Pp1);
+            polyVertexList.push_back(Pp2);
+            polyVertexList.push_back(Pp3);
+            //create the polygon
+            Polygon poly = Polygon(polyVertexList);
+            //add polygon to faceList
+            faceList.push_back(poly);
         }
+        //now that we have populated the lists, we will make the mesh for the torus
+        Mesh torus = Mesh(vertexList, faceList);
+        return torus;
+    }
+
 
 
 }
@@ -365,7 +389,7 @@ int main() {
         C = *build_camera_matrix(&E,&G) ;
         Mesh sphere = createSphere(C);
         Drawer drawer = Drawer(disp, window, GC, C, C);
-        drawer.drawPolygon(sphere);
+        drawer.drawMesh(sphere);
         
         char inp='0';
         while(inp!='q'){

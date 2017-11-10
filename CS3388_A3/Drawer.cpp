@@ -3,22 +3,30 @@ Purpose: This is the header file for the drawer class takes care of the visualiz
 Date: 11/8/2017
 */
 #include "Drawer.h"
-#include <math.h>
-#include <X11/Xlib.h>
-#include <vector>
+
 
 //constructor
 Drawer::Drawer(Display *disp1, Window window1, GC gc1, dmatrix_t camera1, dmatrix_t light1)
 {
-	this->disp=disp1;
-	this->window=window1;
-	this->gc=gc1;
-	this->camera = camera1;
-	this->light = light1;
+	disp=disp1;
+	window=window1;
+	gc=gc1;
+	camera = camera1;
+	light = light1;
 }
 //deconstructor
 Drawer::~Drawer()
 {
+}
+void Drawer::drawMesh(Mesh mesh){
+	for (int i=0; i<faceList.size(); i++;){
+		Polygon face = faceList.at(i);
+		dmatrix_t n = face.getNormal(); 
+		if (acos((n.m[1][1]*camera.m[1][1]+n.m[2][1]*camera.m[2][1]+n.m[3][1]*camera.m[3][1])/(sqrt(n.m[1][1]*n.m[1][1]+n.m[2][1]*n.m[2][1]+n.m[3][1]*n.m[3][1])*sqrt(camera.m[1][1]*camera.m[1][1]+camera.m[2][1]*camera.m[2][1]+camera.m[3][1]*camera.m[3][1])))<90.0){
+			//do nothing
+		}else{
+			drawPolygon(faceList.at(i));
+		}
 }
 void Drawer::fillPolygon(Polygon p){
 
