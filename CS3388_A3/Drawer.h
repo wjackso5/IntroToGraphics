@@ -8,7 +8,9 @@ Date: 11/8/2017
 #include <X11/Xlib.h>
 #include <vector>
 #include "Mesh.h"
+extern "C"{
 #include "matrix.h"
+}
 class Drawer
 {
 private:

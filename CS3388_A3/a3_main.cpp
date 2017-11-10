@@ -3,7 +3,9 @@
  PREREQUISITES : matrix.h
  This is a modified version of the camera.c file given to us to complete the assignmet, i added code to compute the points of the object and to draw them using x11
  */
+extern "C"{
 #include "matrix.h"
+}
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
