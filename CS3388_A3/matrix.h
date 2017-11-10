@@ -5,6 +5,7 @@
 */
 #ifndef MATRIX_H
 #define MATRIX_H
+extern "C"{
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -473,4 +474,5 @@ dmatrix_t *from_homogeneous(dmatrix_t *A) {
   }
   return B ;
 } 
+}
 #endif
