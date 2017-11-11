@@ -39,6 +39,8 @@ based off of assignment-2-solution.c*/
 
 #define EPSILON 0.0001
 
+#define M_PI 3.1415926535897932384626433832795028
+
 Display *InitX(Display *d,Window *w,int *s) {
     
   d = XOpenDisplay(NULL) ;
@@ -84,11 +86,10 @@ void exchangeInt(int *a, int *b)
   *b = t ;
 }
 
-
 void bresenham(Display *d, Window w, int s, int x1, int y1, int x2, int y2)
 
 { int Transx, Transy, Pi, Dx, Dy, Two_Dx, Two_Dy, i, Inc1stcoord, Inc2ndcoord, Exchange ;
-    
+  
   Exchange = FALSE ;
   Inc1stcoord = 1 ;
   Inc2ndcoord = 1 ;
@@ -148,7 +149,43 @@ void bresenham(Display *d, Window w, int s, int x1, int y1, int x2, int y2)
     }
   }
 }
-
+//implementation of line scan polygon filling algorithm
+void polyfill(Display *d, Window w, int s, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4){
+	//find ymin
+	double i1, i2, m1, m2, m3, m4;
+	int i1f=0;
+	int i2f=0;
+	int ymin=y1;
+	if (y2<ymin)ymin=y2;
+	if (y3<ymin)ymin=y3;
+	if (y4<ymin)ymin=y4;
+	//find ymax
+	int ymax=y1;
+	if (y2<ymax)ymax=y2;
+	if (y3<ymax)ymax=y3;
+	if (y4<ymax)ymax=y4;
+	int scanline = ymax;
+	//calculate slopes
+	m1=(y2-y1)/(x2-x1);
+	m2=(y3-y2)/(x3-x2);
+	m3=(y4-y3)/(x4-x3);
+	m4=(y1-y4)/(x1-x4);
+	while (scanline >= ymin){
+		//calculate instersections with scanline and fill
+			if  (m1>2147483634||m1<-2147483634){i1=x1;}else{
+			i1 = ((scanline-y1)/m1)+x1;}
+			if (m3>2147483634||m3<-2147483634){i2=x3;}else{
+			i2 = ((scanline-y3)/m3)+x3;}
+			printf("i1=%f\n",i1);
+			printf("i2=%f\n",i2);
+			printf("%d\n",m3);
+			printf("%d\n",x3);
+			
+			bresenham(d,w,s,(int)i1,scanline,(int)i2,scanline);
+		
+		scanline = scanline -1;
+	}
+}
 
 dmatrix_t *build_camera_matrix(dmatrix_t *E, dmatrix_t *G) {
     
@@ -277,89 +314,94 @@ dmatrix_t *torus_point(dmatrix_t *P, double a, double c, double theta, double rh
 
 
 void shade_wiremesh_sphere(Display *d, Window w, int s, dmatrix_t *C, dmatrix_t *L, double radius, double theta_lower_bound, double theta_upper_bound, double rho_lower_bound, double rho_upper_bound, double delta_theta, double delta_rho) {
-
   int i ;
   double theta, rho ;
   //points of the current polygon
-  dmatrix_t P0[TRIANGLE] ;
-  dmatrix_t P1[TRIANGLE] ;
-  dmatrix_t P2[TRIANGLE] ;
-  dmatrix_t P3[TRIANGLE];
+  dmatrix_t P[TRIANGLE+1] ;
+  dmatrix_t N;
+  dmat_alloc(&N,4,1)	 ;
 
-  for (i = 0 ; i < TRIANGLE ; i++) {
-    dmat_alloc(&P0[i],4,1) ;
-	dmat_alloc(&P1[i], 4, 1);
-	dmat_alloc(&P2[i], 4, 1);
-	dmat_alloc(&P3[i], 4, 1);
+  for (i = 0 ; i < TRIANGLE+1 ; i++) {
+    dmat_alloc(&P[i],4,1) ;
   }
- 
+  
   for (theta = theta_lower_bound ; theta + delta_theta < theta_upper_bound + EPSILON ; theta += delta_theta) {
     for (rho = rho_lower_bound ; rho + delta_rho < rho_upper_bound + EPSILON ; rho += delta_rho) {
-		double temp_theta = theta;
-		double temp_rho = rho;
-		//set p0
-		P0[0] = *perspective_projection(dmat_mult(C, sphere_point(&P0[0], radius, temp_theta, temp_rho)));
-		P0[1] = *perspective_projection(dmat_mult(C, sphere_point(&P0[1], radius, temp_theta + delta_theta, temp_rho)));
-		P0[2] = *perspective_projection(dmat_mult(C, sphere_point(&P0[2], radius, temp_theta, temp_rho + delta_rho)));
-		//set p1
-		temp_theta = theta + delta_theta;
-		temp_rho = rho;
-		P1[0] = *perspective_projection(dmat_mult(C, sphere_point(&P1[0], radius, temp_theta, temp_rho)));
-		P1[1] = *perspective_projection(dmat_mult(C, sphere_point(&P1[1], radius, temp_theta + delta_theta, temp_rho)));
-		P1[2] = *perspective_projection(dmat_mult(C, sphere_point(&P1[2], radius, temp_theta, temp_rho + delta_rho)));
-		//set p2
-		temp_theta = theta + delta_theta;
-		temp_rho = rho + delta_rho;
-		P2[0] = *perspective_projection(dmat_mult(C, sphere_point(&P2[0], radius, temp_theta, temp_rho)));
-		P2[1] = *perspective_projection(dmat_mult(C, sphere_point(&P2[1], radius, temp_theta + delta_theta, temp_rho)));
-		P2[2] = *perspective_projection(dmat_mult(C, sphere_point(&P2[2], radius, temp_theta, temp_rho + delta_rho)));
-		//set p3
-		temp_theta = theta;
-		temp_rho = rho + delta_rho;
-		P2[0] = *perspective_projection(dmat_mult(C, sphere_point(&P2[0], radius, temp_theta, temp_rho)));
-		P2[1] = *perspective_projection(dmat_mult(C, sphere_point(&P2[1], radius, temp_theta + delta_theta, temp_rho)));
-		P2[2] = *perspective_projection(dmat_mult(C, sphere_point(&P2[2], radius, temp_theta, temp_rho + delta_rho)));
-		//calculate normal for surface of the polygon
+    	
+    	//points of the polygon
+		P[0] = *perspective_projection(dmat_mult(C, sphere_point(&P[0], radius, theta, rho)));
+		P[1] = *perspective_projection(dmat_mult(C, sphere_point(&P[1], radius, theta + delta_theta, rho)));
+		P[2] = *perspective_projection(dmat_mult(C, sphere_point(&P[2], radius, theta + delta_theta, rho + delta_rho)));
+		P[3] = *perspective_projection(dmat_mult(C, sphere_point(&P[3], radius, theta, rho + delta_rho)));
+		//calculate surface normal
 
-		//draw outlines
-        bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
+		N = *dcross_product(from_homogeneous(dmat_sub(&P[1], &P[0])), from_homogeneous(dmat_sub(&P[2], &P[1])));
+		if(N.m[1][1]==0&&N.m[2][1]==0&&N.m[3][1]==0){
+		N = *dcross_product(from_homogeneous(dmat_sub(&P[1], &P[3])) , from_homogeneous(dmat_sub(&P[2], &P[1])));
+		}
+		
+		//draw outlines and shade using hideback
+		if (acos((Ex*N.m[1][1]+Ey*N.m[2][1]+Ez*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Ez*Ez)+(Ey*Ey)+(Ex*Ex))))<=1.5708){
+		bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
         bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
+        //polyfill(d,w,s,(int)P[0].m[1][1], (int)P[0].m[2][1], (int)P[1].m[1][2],P[1].m[2][1],(int)P[2].m[1][1], (int)P[2].m[2][1],(int)P[3].m[1][1], (int)P[3].m[2][1]);
+		}	
     }
   }
-  for (i = 0 ; i < TRIANGLE ; i++) {
-    free_dmatrix(P0[i].m,1,P[i].l,1,P[i].c) ;
-	free_dmatrix(P1[i].m, 1, P[i].l, 1, P[i].c);
-	free_dmatrix(P2[i].m, 1, P[i].l, 1, P[i].c);
-	free_dmatrix(P3[i].m, 1, P[i].l, 1, P[i].c);
+  for (i = 0 ; i < TRIANGLE+1 ; i++) {
+    free_dmatrix(P[i].m,1,P[i].l,1,P[i].c) ;
   }
 }
 
 
 void shade_wiremesh_torus(Display *d, Window w, int s, dmatrix_t *C, dmatrix_t *L, double a, double c, double theta_lower_bound, double theta_upper_bound, double rho_lower_bound, double rho_upper_bound, double delta_theta, double delta_rho) {
-
   int i ;
   double theta, rho ;
-  dmatrix_t P[TRIANGLE] ;
+  //points of the current polygon
+  dmatrix_t P[TRIANGLE+1] ;
+  dmatrix_t N;
+  dmat_alloc(&N,4,1);
 
-  for (i = 0 ; i < TRIANGLE ; i++) {
+  for (i = 0 ; i < TRIANGLE+1 ; i++) {
     dmat_alloc(&P[i],4,1) ;
   }
- 
-  for (theta = theta_lower_bound ; theta + delta_theta < theta_upper_bound ; theta += delta_theta) {
-    for (rho = rho_lower_bound ; rho + delta_rho < rho_upper_bound ; rho += delta_rho) {
-
-        P[0] = *perspective_projection(dmat_mult(C,torus_point(&P[0],a,c,theta,rho))) ; 
+  
+  for (theta = theta_lower_bound ; theta + delta_theta < theta_upper_bound + EPSILON ; theta += delta_theta) {
+    for (rho = rho_lower_bound ; rho + delta_rho < rho_upper_bound + EPSILON ; rho += delta_rho) {
+    	
+    	//points of the polygon
+		P[0] = *perspective_projection(dmat_mult(C,torus_point(&P[0],a,c,theta,rho))) ; 
         P[1] = *perspective_projection(dmat_mult(C,torus_point(&P[1],a,c,theta+delta_theta,rho))) ;
-        P[2] = *perspective_projection(dmat_mult(C,torus_point(&P[2],a,c,theta,rho+delta_rho))) ;
+        P[2] = *perspective_projection(dmat_mult(C,torus_point(&P[2],a,c,theta+delta_rho,rho+delta_rho))) ;
+		P[3] = *perspective_projection(dmat_mult(C,torus_point(&P[3], a,c, theta, rho + delta_rho)));
+		//calculate surface normal
 
-        bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
-        bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
-    }
-  }
-  for (i = 0 ; i < TRIANGLE ; i++) {
+		N = *dcross_product(from_homogeneous(dmat_sub(&P[1], &P[0])), from_homogeneous(dmat_sub(&P[2], &P[1])));
+		if(N.m[1][1]==0&&N.m[2][1]==0&&N.m[3][1]==0){
+		N = *dcross_product(from_homogeneous(dmat_sub(&P[1], &P[3])) , from_homogeneous(dmat_sub(&P[2], &P[1])));
+		}
+		
+		//draw outlines and shade using hideback
+		if (acos((Ex*N.m[1][1]+Ey*N.m[2][1]+Ez*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Ez*Ez)+(Ey*Ey)+(Ex*Ex))))<=(M_PI/2)){
+			//get the correct color shading
+			double Lx=Ex+150;
+			double Ly=Ey+150;
+			double Lz=Ez+100;
+
+			double angle = acos((Lx*N.m[1][1]+Lx*N.m[2][1]+Lz*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Lx*Lx)+(Ly*Ly)+(Lz*Lz))))	;	
+			printf("%f\n", (angle));
+			SetCurrentColorX(d,&(DefaultGC(d,s)),0,0,(angle/(M_PI/2)*255));
+			bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
+        	bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
+        	//polyfill(d,w,s,(int)P[0].m[1][1], (int)P[0].m[2][1], (int)P[1].m[1][2],P[1].m[2][1],(int)P[2].m[1][1], (int)P[2].m[2][1],(int)P[3].m[1][1], (int)P[3].m[2][1]);
+		}	
+    	}
+	}
+  for (i = 0 ; i < TRIANGLE+1 ; i++) {
     free_dmatrix(P[i].m,1,P[i].l,1,P[i].c) ;
   }
 }
+
 
 
 int main() {
@@ -395,7 +437,7 @@ int main() {
   dmat_alloc(&C,4,4) ;
   C = *build_camera_matrix(&E,&G) ; /* The camera matrix */
 
-  delta_theta = 2.0*M_PI/36.0 ; 
+  delta_theta = 2.0*M_PI/48.0 ; 
   delta_rho = M_PI/18.0 ; 
   radius = 10.0 ;
   a = 5.0 ;
@@ -405,7 +447,7 @@ int main() {
   d = InitX(d,&w,&s) ;
   SetCurrentColorX(d,&(DefaultGC(d,s)),r,g,b) ;
   XNextEvent(d,&e) ;
-
+  printf("Hello main\n");
   while (1) {
     XNextEvent(d,&e) ;
     if (e.type == Expose) {

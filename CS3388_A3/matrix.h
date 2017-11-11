@@ -3,9 +3,6 @@
         PREREQUISITES : None
 
 */
-extern "C"{
-#ifndef MATRIX_H
-#define MATRIX_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -134,7 +131,7 @@ dmatrix_t *dmat_mult(dmatrix_t *A, dmatrix_t *B)
   int i, j, k ;
 
   if ((*A).c != (*B).l) {
-    nrerror("MATRIX.H: incompatible matrix sizes") ;
+    nrerror("MATRIX.H: mult incompatible matrix sizes") ;
   }
   C = (dmatrix_t *)malloc(sizeof(dmatrix_t)) ;
   dmat_alloc(C,(*A).l,(*B).c) ;
@@ -179,7 +176,7 @@ dmatrix_t *dmat_sub(dmatrix_t *A, dmatrix_t *B)
   int i, j ;
 
   if ((*A).l != (*B).l || (*A).c != (*B).c) {
-    nrerror("MATRIX.H: incompatible matrix sizes") ;
+    nrerror("MATRIX.H: sub incompatible matrix sizes") ;
   }
   C = (dmatrix_t *)malloc(sizeof(dmatrix_t)) ;
   dmat_alloc(C,(*A).l,(*A).c) ;
@@ -286,21 +283,21 @@ dmatrix_t *dcross_product(dmatrix_t *A, dmatrix_t *B)
   dmat_alloc(&E,3,3) ;
 
   if (((*A).l != 1 && (*A).c != 1) || ((*B).l != 1 && (*B).c != 1)) {
-    nrerror("MATRIX.H: Incompatible matrix sizes") ;
+    nrerror("MATRIX.H: c Incompatible matrix sizes") ;
   }
 
   if ((*A).l != 1) {
     C = *dmat_transpose(A) ;
   }
   if ((*A).l != 3) {
-    nrerror("MATRIX.H: Incompatible matrix sizes") ;
+    nrerror("MATRIX.H: cIncompatible matrix sizes") ;
   }
 
   if ((*B).l != 1) {
     D = dmat_transpose(B) ;
   }
   if ((*B).l != 3) {
-    nrerror("MATRIX.H: Incompatible matrix sizes") ;
+    nrerror("MATRIX.H: cIncompatible matrix sizes") ;
   }
   E = *dmat_init(&E,0.0) ;
   E.m[1][2] = -(*D).m[1][3] ;
@@ -475,5 +472,4 @@ dmatrix_t *from_homogeneous(dmatrix_t *A) {
   }
   return B ;
 } 
-}
-#endif
+
