@@ -12,7 +12,7 @@ based off of assignment-2-solution.c*/
 
 #define Ex 20.0
 #define Ey 20.0
-#define Ez 40.0
+#define Ez 100.0
 
 #define Gx 0.0
 #define Gy 0.0
@@ -437,7 +437,7 @@ void shade_wiremesh_torus(Display *d, Window w, int s, dmatrix_t *C, dmatrix_t *
 			double angle = acos((Lx*N.m[1][1]+Lx*N.m[2][1]+Lz*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Lx*Lx)+(Ly*Ly)+(Lz*Lz))))	;	
 			SetCurrentColorX(d,&(DefaultGC(d,s)),0,0,(angle*(2/M_PI)*255));
 			bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
-        	bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
+      bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
         	//polyfill(d,w,s,(int)P[0].m[1][1], (int)P[0].m[2][1], (int)P[1].m[1][2],P[1].m[2][1],(int)P[2].m[1][1], (int)P[2].m[2][1],(int)P[3].m[1][1], (int)P[3].m[2][1]);
 		}	
     	}
@@ -499,7 +499,6 @@ int main() {
       shade_wiremesh_sphere(d,w,s,&C, &L, radius,0.0,2.0*M_PI,0.0,M_PI,delta_theta,delta_rho) ;
       shade_wiremesh_torus(d,w,s,&C, &L, a,c,0.0,2.0*M_PI,0.0,2.0*M_PI,delta_theta,delta_theta) ;
       shade_wiremesh_cone(d,w,s,&C, &L, radius,0.0,2.0*M_PI,0.0,M_PI,delta_theta,delta_rho) ;
-
     }
     if(e.type == KeyPress)
       break ;
