@@ -176,14 +176,10 @@ void polyfill(Display *d, Window w, int s, int x1, int y1, int x2, int y2, int x
 			i1 = ((scanline-y1)/m1)+x1;}
 			if (m3>2147483634||m3<-2147483634){i2=x3;}else{
 			i2 = ((scanline-y3)/m3)+x3;}
-			printf("i1=%f\n",i1);
-			printf("i2=%f\n",i2);
-			printf("%d\n",m3);
-			printf("%d\n",x3);
 			
 			bresenham(d,w,s,(int)i1,scanline,(int)i2,scanline);
 		
-		scanline = scanline -1;
+		  scanline = scanline -1;
 	}
 }
 
@@ -301,6 +297,16 @@ dmatrix_t *sphere_point(dmatrix_t *P, double r, double theta, double rho) {
   return P ;
 }
 
+dmatrix_t *cone_point(dmatrix_t *P, double r, double theta, double rho) {
+
+  (*P).m[1][1] = r*cos(theta) ;
+  (*P).m[2][1] = r*sin(theta) ;
+  (*P).m[3][1] = r;
+  (*P).m[4][1] = 1.0 ;
+
+  return P ;
+}
+
 
 dmatrix_t *torus_point(dmatrix_t *P, double a, double c, double theta, double rho) {
 
@@ -341,11 +347,51 @@ void shade_wiremesh_sphere(Display *d, Window w, int s, dmatrix_t *C, dmatrix_t 
 		}
 		
 		//draw outlines and shade using hideback
-		if (acos((Ex*N.m[1][1]+Ey*N.m[2][1]+Ez*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Ez*Ez)+(Ey*Ey)+(Ex*Ex))))<=1.5708){
-		bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
-        bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
+		if (acos((Ex*N.m[1][1]+Ey*N.m[2][1]+Ez*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Ez*Ez)+(Ey*Ey)+(Ex*Ex))))<=(M_PI/2)){
+		  bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
+      bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
         //polyfill(d,w,s,(int)P[0].m[1][1], (int)P[0].m[2][1], (int)P[1].m[1][2],P[1].m[2][1],(int)P[2].m[1][1], (int)P[2].m[2][1],(int)P[3].m[1][1], (int)P[3].m[2][1]);
 		}	
+    }
+  }
+  for (i = 0 ; i < TRIANGLE+1 ; i++) {
+    free_dmatrix(P[i].m,1,P[i].l,1,P[i].c) ;
+  }
+}
+
+void shade_wiremesh_cone(Display *d, Window w, int s, dmatrix_t *C, dmatrix_t *L, double radius, double theta_lower_bound, double theta_upper_bound, double rho_lower_bound, double rho_upper_bound, double delta_theta, double delta_rho) {
+  int i ;
+  double theta, rho ;
+  //points of the current polygon
+  dmatrix_t P[TRIANGLE+1] ;
+  dmatrix_t N;
+  dmat_alloc(&N,4,1)   ;
+
+  for (i = 0 ; i < TRIANGLE+1 ; i++) {
+    dmat_alloc(&P[i],4,1) ;
+  }
+  
+  for (theta = theta_lower_bound ; theta + delta_theta < theta_upper_bound + EPSILON ; theta += delta_theta) {
+    for (rho = rho_lower_bound ; rho + delta_rho < rho_upper_bound + EPSILON ; rho += delta_rho) {
+      
+      //points of the polygon
+    P[0] = *perspective_projection(dmat_mult(C, cone_point(&P[0], radius, theta, rho)));
+    P[1] = *perspective_projection(dmat_mult(C, cone_point(&P[1], radius, theta + delta_theta, rho)));
+    P[2] = *perspective_projection(dmat_mult(C, cone_point(&P[2], radius, theta + delta_theta, rho + delta_rho)));
+    P[3] = *perspective_projection(dmat_mult(C, cone_point(&P[3], radius, theta, rho + delta_rho)));
+    //calculate surface normal
+
+    N = *dcross_product(from_homogeneous(dmat_sub(&P[1], &P[0])), from_homogeneous(dmat_sub(&P[2], &P[1])));
+    if(N.m[1][1]==0&&N.m[2][1]==0&&N.m[3][1]==0){
+    N = *dcross_product(from_homogeneous(dmat_sub(&P[1], &P[3])) , from_homogeneous(dmat_sub(&P[2], &P[1])));
+    }
+    
+    //draw outlines and shade using hideback
+    if (acos((Ex*N.m[1][1]+Ey*N.m[2][1]+Ez*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Ez*Ez)+(Ey*Ey)+(Ex*Ex))))<=(M_PI/2)){
+      bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
+      bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
+        //polyfill(d,w,s,(int)P[0].m[1][1], (int)P[0].m[2][1], (int)P[1].m[1][2],P[1].m[2][1],(int)P[2].m[1][1], (int)P[2].m[2][1],(int)P[3].m[1][1], (int)P[3].m[2][1]);
+    } 
     }
   }
   for (i = 0 ; i < TRIANGLE+1 ; i++) {
@@ -371,8 +417,8 @@ void shade_wiremesh_torus(Display *d, Window w, int s, dmatrix_t *C, dmatrix_t *
     	
     	//points of the polygon
 		P[0] = *perspective_projection(dmat_mult(C,torus_point(&P[0],a,c,theta,rho))) ; 
-        P[1] = *perspective_projection(dmat_mult(C,torus_point(&P[1],a,c,theta+delta_theta,rho))) ;
-        P[2] = *perspective_projection(dmat_mult(C,torus_point(&P[2],a,c,theta+delta_rho,rho+delta_rho))) ;
+    P[1] = *perspective_projection(dmat_mult(C,torus_point(&P[1],a,c,theta+delta_theta,rho))) ;
+    P[2] = *perspective_projection(dmat_mult(C,torus_point(&P[2],a,c,theta+delta_rho,rho+delta_rho))) ;
 		P[3] = *perspective_projection(dmat_mult(C,torus_point(&P[3], a,c, theta, rho + delta_rho)));
 		//calculate surface normal
 
@@ -384,13 +430,12 @@ void shade_wiremesh_torus(Display *d, Window w, int s, dmatrix_t *C, dmatrix_t *
 		//draw outlines and shade using hideback
 		if (acos((Ex*N.m[1][1]+Ey*N.m[2][1]+Ez*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Ez*Ez)+(Ey*Ey)+(Ex*Ex))))<=(M_PI/2)){
 			//get the correct color shading
-			double Lx=Ex+150;
-			double Ly=Ey+150;
-			double Lz=Ez+100;
+			double Lx=Ex+150.0;
+			double Ly=Ey+100.0;
+			double Lz=Ez;
 
 			double angle = acos((Lx*N.m[1][1]+Lx*N.m[2][1]+Lz*N.m[3][1])/(sqrt(N.m[1][1]*N.m[1][1]+N.m[2][1]*N.m[2][1]+N.m[3][1]*N.m[3][1])*sqrt((Lx*Lx)+(Ly*Ly)+(Lz*Lz))))	;	
-			printf("%f\n", (angle));
-			SetCurrentColorX(d,&(DefaultGC(d,s)),0,0,(angle/(M_PI/2)*255));
+			SetCurrentColorX(d,&(DefaultGC(d,s)),0,0,(angle*(2/M_PI)*255));
 			bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[1].m[1][1],(int)P[1].m[2][1]) ;
         	bresenham(d,w,s,(int)P[0].m[1][1],(int)P[0].m[2][1],(int)P[2].m[1][1],(int)P[2].m[2][1]) ;
         	//polyfill(d,w,s,(int)P[0].m[1][1], (int)P[0].m[2][1], (int)P[1].m[1][2],P[1].m[2][1],(int)P[2].m[1][1], (int)P[2].m[2][1],(int)P[3].m[1][1], (int)P[3].m[2][1]);
@@ -453,6 +498,8 @@ int main() {
     if (e.type == Expose) {
       shade_wiremesh_sphere(d,w,s,&C, &L, radius,0.0,2.0*M_PI,0.0,M_PI,delta_theta,delta_rho) ;
       shade_wiremesh_torus(d,w,s,&C, &L, a,c,0.0,2.0*M_PI,0.0,2.0*M_PI,delta_theta,delta_theta) ;
+      shade_wiremesh_cone(d,w,s,&C, &L, radius,0.0,2.0*M_PI,0.0,M_PI,delta_theta,delta_rho) ;
+
     }
     if(e.type == KeyPress)
       break ;
